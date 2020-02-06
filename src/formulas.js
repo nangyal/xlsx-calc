@@ -731,10 +731,34 @@ function min() {
     return min;
 }
 
-function vlookup(key, matrix, return_index) {
+function isString(x) {
+    return Object.prototype.toString.call(x) === "[object String]"
+}
+
+function vlookup(key, matrix, return_index, range_lookup) {
+    var lastRangeResult = null;
     for (var i = 0; i < matrix.length; i++) {
-        if (matrix[i][0] == key) {
-            return matrix[i][return_index - 1];
+        if(range_lookup === 1) {
+            var firstCol = matrix[i][0];
+            if( isString(firstCol) && isString(key) ) {
+                var strComparison = key.toLowerCase().localeCompare(firstCol.toLowerCase());
+                if (strComparison>=0) {
+                    lastRangeResult = matrix[i][return_index - 1];
+                }else{
+                    if(lastRangeResult !== null) return lastRangeResult;
+                }
+            }else{
+                if (key>=firstCol) {
+                    lastRangeResult = matrix[i][return_index - 1];
+                    if(i===matrix.length-1) return lastRangeResult;
+                }else{
+                    if(lastRangeResult !== null) return lastRangeResult;
+                }
+            }
+        }else{
+            if (matrix[i][0] == key) {
+                return matrix[i][return_index - 1];
+            }
         }
     }
     throw Error('#N/A');
@@ -847,5 +871,5 @@ function substitute(text, old_text, new_text, occurrence) {
       }
     }
   };
-
+  
 module.exports = formulas;
